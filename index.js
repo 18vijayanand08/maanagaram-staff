@@ -85,18 +85,23 @@ function getStatus(userId) {
 
 // 🔥 POST (for frontend usage)
 app.post("/api/staff-status", (req, res) => {
-  const staffList = req.body;
+  try {
+    const staffList = req.body;
 
-  if (!Array.isArray(staffList)) {
-    return res.status(400).json({ error: "Invalid data" });
+    if (!Array.isArray(staffList)) {
+      return res.status(400).json({ error: "Invalid data" });
+    }
+
+    const result = staffList.map((staff) => ({
+      ...staff,
+      status: getStatus(staff.discordId),
+    }));
+
+    res.json(result);
+  } catch (err) {
+    console.error("API Error:", err);
+    res.status(500).json({ error: "Server error" });
   }
-
-  const result = staffList.map((staff) => ({
-    ...staff,
-    status: getStatus(staff.discordId),
-  }));
-
-  res.json(result);
 });
 
 /* =========================================
